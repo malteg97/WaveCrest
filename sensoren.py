@@ -23,23 +23,31 @@ class HeadingSensor(Sensor):
         return round(self.current_heading, 2)  # Rückgabe des Kurses
 
 
-class WindSensor(Sensor):
-    """Simuliert einen Wind-Sensor."""
+class WindDir(Sensor):
+    """Simuliert Windrichtung."""
     def __init__(self):
-        super().__init__("Wind")
-        self.wind_speed = random.uniform(5, 20)  # Windgeschwindigkeit in Knoten
-        self.wind_direction = random.uniform(0, 360)  # Windrichtung
+        super().__init__("Wind Dir")
+        self.WindDir = random.uniform(0, 360)  # Windrichtung in °
 
     def get_data(self):
-        # Simulierte Schwankungen in Windrichtung und -geschwindigkeit
-        self.wind_speed += random.uniform(-0.5, 0.5)
-        self.wind_speed = max(0, self.wind_speed)  # Keine negativen Geschwindigkeiten
-        self.wind_direction += random.uniform(-2, 2)
-        self.wind_direction %= 360  # Wertebereich: 0–360 Grad
-        return {
-            "speed": round(self.wind_speed, 2),
-            "direction": round(self.wind_direction, 2)
-        }
+        # Simulierte Schwankungen in Windrichtung
+        self.WindDir+= random.uniform(-0.5, 0.5)
+        self.WindDir %= 360 # Wertebereich: 0–360 Grad
+
+        return round(self.WindDir, 2)
+    
+class WindSpd(Sensor):
+    """Simuliert Windgeschwindigkeit."""
+    def __init__(self):
+        super().__init__("Wind Speed")
+        self.WindSpd = random.uniform(0, 50)  # Windgeschwindigkeit in Knoten
+
+    def get_data(self):
+        # Simulierte Schwankungen in Bootsgeschwindigkeit
+        self.WindSpd += random.uniform(-0.5, 0.5)
+        self.WindSpd = max(0, self.WindSpd)  # Keine negativen Geschwindigkeiten
+
+        return round(self.WindSpd, 2)    
 
 class SoGSensor(Sensor):
     """Simuliert Geschwindigkeit über Grund."""
@@ -95,7 +103,8 @@ class RudderSensor(Sensor):
 if __name__ == "__main__":
     compass = HeadingSensor()
     CoG_sensor = CoGSensor()
-    wind = WindSensor()
+    windspd = WindSpd()
+    winddir = WindDir()
     SoG_sensor=SoGSensor()
     StW_sensor=StWSensor()
     rudder_sensor=RudderSensor()
@@ -103,8 +112,8 @@ if __name__ == "__main__":
     for _ in range(5):  # Fünf Abfragen simulieren
         print(f"Kompass: {compass.get_data()}°")
         print(f"CoG: {CoG_sensor.get_data()}°")
-        wind_data = wind.get_data()
-        print(f"Wind: {wind_data['speed']} Knoten, {wind_data['direction']}°")
+        print(f"Wind Speed: {windspd.get_data()}kn")
+        print(f"Wind Direction: {winddir.get_data()}°")
         print(f"SoG: {SoG_sensor.get_data()}kn")
         print(f"StW: {StW_sensor.get_data()}kn")
         print(f"Rudder Angle: {rudder_sensor.get_data()}°")
