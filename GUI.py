@@ -1,49 +1,90 @@
-import tkinter as tk
-from sensoren import HeadingSensor, CoGSensor, WindSpd, WindDir, SoGSensor, StWSensor, RudderSensor
-import time
+import tkinter as tk  # Importiert das tkinter-Modul, das für die GUI-Erstellung verwendet wird.
+import sensoren_self as s 
+import errechnete_Daten as D
 
-# Sensoren initialisieren
-sensors = {
-    "Kompass (°)": HeadingSensor(),
-    "CoG (°)": CoGSensor(),
-    "Windgeschwindigkeit (kn)": WindSpd(),
-    "Windrichtung (°)": WindDir(),
-    "SoG (kn)": SoGSensor(),
-    "StW (kn)": StWSensor(),
-    "Ruderwinkel (°)": RudderSensor()
-}
+# Sensoren
+SoG = round(s.SoGSensor(), 2)
+CoG = round(s.CoGSensor(), 2)
+heading = round(s.HeadingSensor(), 2)
+wind_s = round(D.TrueWindSpeed(), 2)
+wind_a = round(D.TrueWindAngle(), 2)
+StW = round(s.StWSensor(), 2)
 
-class SensorDashboard(tk.Tk):
-    def __init__(self, sensors, interval=500):
-        super().__init__()
-        self.sensors = sensors
-        self.interval = interval  # Intervall in Millisekunden
-        self.title("Sensor Dashboard")
-        self.geometry("800x400")
-        self.configure(bg="black")
+# Designkonfig
+w_colour = "white"
+b_colour = "black"
+space_x = 10
+space_y = 10
+size_y = 100
+size_x = 180
 
-        self.labels = {}
-        for i, (sensor_name, sensor) in enumerate(sensors.items()):
-            frame = tk.Frame(self, bg="black")
-            frame.grid(row=i//2, column=i%2, padx=20, pady=20)
+root = tk.Tk()
+root.title('Sensordaten')
 
-            label_title = tk.Label(frame, text=sensor_name, font=("Arial", 16), fg="white", bg="black")
-            label_title.pack()
+# SoG Anzeige
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=1, column=1, padx=space_x, pady=space_y)
 
-            label_value = tk.Label(frame, text="0", font=("Arial", 36, "bold"), fg="white", bg="black")
-            label_value.pack()
+label_title = tk.Label(frame, text='SoG', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
 
-            self.labels[sensor_name] = label_value
+label_value = tk.Label(frame, text=f"{SoG}kn", font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
 
-        self.update_data()
+# CoG Anzeige
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=1, column=2, padx=space_x, pady=space_y)
 
-    def update_data(self):
-        for sensor_name, sensor in self.sensors.items():
-            value = sensor.get_data()
-            self.labels[sensor_name].config(text=f"{value}")
-        self.after(self.interval, self.update_data)
+label_title = tk.Label(frame, text='CoG', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
 
+label_value = tk.Label(frame, text=f'{CoG}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
 
-if __name__ == "__main__":
-    app = SensorDashboard(sensors)
-    app.mainloop()
+# Heading Anzeige
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=2, column=2, padx=space_x, pady=space_y)
+
+label_title = tk.Label(frame, text='Heading', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
+
+label_value = tk.Label(frame, text=f'{heading}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
+
+# Wind Speed
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=1, column=3, padx=space_x, pady=space_y)
+
+label_title = tk.Label(frame, text='TWS', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
+
+label_value = tk.Label(frame, text=f'{wind_s}kn', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
+
+# Wind Angle
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=2, column=3, padx=space_x, pady=space_y)
+
+label_title = tk.Label(frame, text='TWA', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
+
+label_value = tk.Label(frame, text=f'{wind_a}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
+
+# Speed through Water
+frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
+frame.pack_propagate(False)
+frame.grid(row=2, column=1, padx=space_x, pady=space_y)
+
+label_title = tk.Label(frame, text='StW', font=("Arial", 16), fg=w_colour, bg=b_colour)
+label_title.pack()
+
+label_value = tk.Label(frame, text=f'{StW}kn', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+label_value.pack()
+
+root.mainloop()
