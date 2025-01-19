@@ -1,14 +1,5 @@
-import tkinter as tk  # Importiert das tkinter-Modul, das für die GUI-Erstellung verwendet wird.
-import sensoren_self as s 
-import errechnete_Daten as D
-
-# Sensoren
-SoG = round(s.SoGSensor(), 2)
-CoG = round(s.CoGSensor(), 2)
-heading = round(s.HeadingSensor(), 2)
-wind_s = round(D.TrueWindSpeed(), 2)
-wind_a = round(D.TrueWindAngle(), 2)
-StW = round(s.StWSensor(), 2)
+import tkinter as tk
+import Funktionen as F
 
 # Designkonfig
 w_colour = "white"
@@ -18,73 +9,54 @@ space_y = 10
 size_y = 100
 size_x = 180
 
-root = tk.Tk()
-root.title('Sensordaten')
+class SensorGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Sensordaten")
+        self.labels = {}
+        self.create_gui()
 
-# SoG Anzeige
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=1, column=1, padx=space_x, pady=space_y)
+    def create_sensor_tile(self, row, column, title, unit):
+        frame = tk.Frame(self.root, bg=b_colour, width=size_x, height=size_y)
+        frame.pack_propagate(False)
+        frame.grid(row=row, column=column, padx=space_x, pady=space_y)
 
-label_title = tk.Label(frame, text='SoG', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
+        label_title = tk.Label(frame, text=title, font=("Arial", 16), fg=w_colour, bg=b_colour)
+        label_title.pack()
 
-label_value = tk.Label(frame, text=f"{SoG}kn", font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
+        label_value = tk.Label(frame, text=f"0 {unit}", font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
+        label_value.pack()
 
-# CoG Anzeige
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=1, column=2, padx=space_x, pady=space_y)
+        return label_value
 
-label_title = tk.Label(frame, text='CoG', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
+    def create_gui(self):
+        self.labels["SoG"] = self.create_sensor_tile(1, 1, "SoG", "kn")
+        self.labels["CoG"] = self.create_sensor_tile(1, 2, "CoG", "°")
+        self.labels["Heading"] = self.create_sensor_tile(2, 2, "Heading", "°")
+        self.labels["TWS"] = self.create_sensor_tile(1, 3, "TWS", "kn")
+        self.labels["TWA"] = self.create_sensor_tile(2, 3, "TWA", "°")
+        self.labels["StW"] = self.create_sensor_tile(2, 1, "StW", "kn")
 
-label_value = tk.Label(frame, text=f'{CoG}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
+    def update_values(self, sensor_data):
+        # Hier werden nur ausgewählte Werte im GUI angezeigt
+        self.labels["SoG"].config(text=f"{sensor_data['SoG']:.2f} kn")
+        self.labels["CoG"].config(text=f"{sensor_data['CoG']:.2f}°")
+        self.labels["Heading"].config(text=f"{sensor_data['Heading']:.2f}°")
+        self.labels["TWS"].config(text=f"{sensor_data['TWS']:.2f} kn")
+        self.labels["TWA"].config(text=f"{sensor_data['TWA']:.2f}°")
+        self.labels["StW"].config(text=f"{sensor_data['StW']:.2f} kn")
 
-# Heading Anzeige
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=2, column=2, padx=space_x, pady=space_y)
+root = None
+gui = None
 
-label_title = tk.Label(frame, text='Heading', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
+# Aktualisiere die GUI in regelmäßigen Intervallen
+def init_GUI():
+    global root, gui
+    root = tk.Tk()
+    gui = SensorGUI(root)
 
-label_value = tk.Label(frame, text=f'{heading}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
-
-# Wind Speed
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=1, column=3, padx=space_x, pady=space_y)
-
-label_title = tk.Label(frame, text='TWS', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
-
-label_value = tk.Label(frame, text=f'{wind_s}kn', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
-
-# Wind Angle
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=2, column=3, padx=space_x, pady=space_y)
-
-label_title = tk.Label(frame, text='TWA', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
-
-label_value = tk.Label(frame, text=f'{wind_a}°', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
-
-# Speed through Water
-frame = tk.Frame(bg=b_colour, width=size_x, height=size_y)
-frame.pack_propagate(False)
-frame.grid(row=2, column=1, padx=space_x, pady=space_y)
-
-label_title = tk.Label(frame, text='StW', font=("Arial", 16), fg=w_colour, bg=b_colour)
-label_title.pack()
-
-label_value = tk.Label(frame, text=f'{StW}kn', font=("Arial", 36, "bold"), fg=w_colour, bg=b_colour)
-label_value.pack()
-
-root.mainloop()
+def update_GUI():
+    global root,gui
+    sensor_data = F.get_sensor_data()
+    gui.update_values(sensor_data)
+    root.after(1000, update_GUI)  # Aktualisiere alle 1 Sekunde
